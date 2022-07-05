@@ -1,14 +1,14 @@
-from dataclasses import dataclass, field
+import attr
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from tgsprint.button import MenuButton
 from emoji import emojize
 
-@dataclass
+@attr.s(auto_attribs=True)
 class BaseMenu(object):
     name: str
     prompt: str
-    buttons: List[MenuButton] = field(default_factory=list)
+    buttons: List[MenuButton] = attr.Factory(list)
     inline: bool = False
     edit_message: bool = True
 
@@ -54,6 +54,6 @@ class BaseMenu(object):
             raise NotImplementedError()
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class InlineMenu(BaseMenu):
     inline: bool = True
