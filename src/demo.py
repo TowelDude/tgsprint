@@ -21,6 +21,8 @@ def null(update: Update, context: TGContext):
 
 def respond_echo(update: Update, context: TGContext, message: str):
     context.context.bot.send_message(update.effective_chat.id, f'You said: {message}')
+    tg.resend_menu(update, context)
+    
     return BaseState(context.get_current_menu())
 
 def echo(update: Update, context: TGContext):

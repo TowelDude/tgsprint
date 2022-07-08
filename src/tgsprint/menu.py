@@ -10,14 +10,12 @@ class BaseMenu(object):
     prompt: str
     buttons: List[MenuButton] = attr.Factory(list)
     inline: bool = False
-    edit_message: bool = True
 
-    def __init__(self, name: str, prompt: str, buttons: List[MenuButton] = list(), inline: bool = False, edit_message: bool = True) -> None:
+    def __init__(self, name: str, prompt: str, buttons: List[MenuButton] = list(), inline: bool = False) -> None:
         self.name = name
         self.prompt = emojize(prompt, use_aliases=True)
         self.buttons = buttons
         self.inline = inline
-        self.edit_message = edit_message
 
     def add_button(self, button: MenuButton):
         if self.buttons is None:

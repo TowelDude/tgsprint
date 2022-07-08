@@ -1,7 +1,7 @@
 from typing import List
 from tgsprint.button import MenuButton
 from tgsprint.menu import BaseMenu
-from telegram.ext import Updater
+from telegram.ext import Updater, InvalidCallbackData
 from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, MessageHandler, CallbackContext, Filters
 from telegram import Update
 from emoji import emojize
@@ -50,13 +50,16 @@ class TGSprint(object):
         This function handles all callback queries. 
         It will only search for buttons in the current menu in the menu stack
         """
+        if type(update.callback_query.data) is InvalidCallbackData:
+            return
+
         tgcontext = TGContext(context)
         current_menu = tgcontext.get_current_menu()
         update.callback_query.answer()
         query_data = update.callback_query.data
 
         button: MenuButton = current_menu.find_button(query_data)
-    
+
         if button:
             retval = button.callback(update, tgcontext, *button.callback_args)
             if issubclass(type(retval), BaseState):
@@ -65,22 +68,37 @@ class TGSprint(object):
     def _handle_start_command(self, update: Update, context: CallbackContext):
         self.go_home(update, TGContext(context))
 
-    def goto_menu(self, update: Update, context: TGContext, menu: BaseMenu):
-        context.push_menu(menu)
+    def _send_menu(self, update: Update, context: TGContext, menu: BaseMenu):
         keyboard = menu.to_keyboard()
         context.set_state(BaseState(menu))
 
         if menu.inline:
-            if update.callback_query is None or not menu.edit_message:
+            invalidated = context.get_invalidate_keyboard()
+            if update.callback_query is None or invalidated:
+                if invalidated:
+                    context.set_invalidate_keyboard(False)
+
                 context.context.bot.send_message(
                     update.effective_chat.id, emojize(menu.prompt), reply_markup=keyboard
                 )
             else:
                 context.context.bot.edit_message_text(emojize(menu.prompt),
-                                              chat_id=update.callback_query.message.chat_id,
-                                              message_id=update.callback_query.message.message_id,
-                                              reply_markup=keyboard
-                                              )
+                                                      chat_id=update.callback_query.message.chat_id,
+                                                      message_id=update.callback_query.message.message_id,
+                                                      reply_markup=keyboard
+                                                      )
+
+    def resend_menu(self, update: Update, context: TGContext):
+        '''
+        resends current menu, forces invalidation
+        '''
+        current_menu = context.get_current_menu()
+        context.set_invalidate_keyboard(True)
+        self._send_menu(update, context, current_menu)
+
+    def goto_menu(self, update: Update, context: TGContext, menu: BaseMenu):
+        context.push_menu(menu)
+        self._send_menu(update, context, menu)
 
     def go_back(self, update: Update, context: TGContext):
         '''
