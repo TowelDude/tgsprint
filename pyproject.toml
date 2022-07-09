@@ -1,9 +1,6 @@
 [build-system]
 requires = [
     "setuptools>=61.0",
-    "python-telegram-bot==13.12",
-    "emoji",
-    "attrs"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -13,3 +10,9 @@ version = "0.1.2"
 description = "Setup telegram menu bot in lightning speed!"
 requires-python = ">=3.7"
 readme = "README.md"
+dependencies = [
+    "python-telegram-bot==13.12",
+    "emoji",
+    "attrs"
+]
+keywords = ["telegram"]
