@@ -4,7 +4,7 @@ from tgsprint.menu import BaseMenu
 from telegram.ext import Updater, InvalidCallbackData
 from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, MessageHandler, CallbackContext, Filters
 from telegram import Update
-from emoji import emojize
+from tgsprint.utils import emojize
 
 from tgsprint.state import BaseState, UserInputState
 from tgsprint.utils import TGContext

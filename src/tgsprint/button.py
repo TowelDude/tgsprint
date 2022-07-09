@@ -1,6 +1,6 @@
 from typing import Any, Callable, List, Optional
 import typing
-from emoji import emojize
+from tgsprint.utils import emojize
 import attr
 
 if typing.TYPE_CHECKING:

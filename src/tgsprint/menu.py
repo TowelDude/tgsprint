@@ -2,20 +2,14 @@ import attr
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from tgsprint.button import MenuButton
-from emoji import emojize
+from tgsprint.utils import emojize
 
 @attr.s(auto_attribs=True)
 class BaseMenu(object):
     name: str
-    prompt: str
+    prompt: str = attr.field(converter=emojize)
     buttons: List[MenuButton] = attr.Factory(list)
     inline: bool = False
-
-    def __init__(self, name: str, prompt: str, buttons: List[MenuButton] = list(), inline: bool = False) -> None:
-        self.name = name
-        self.prompt = emojize(prompt, use_aliases=True)
-        self.buttons = buttons
-        self.inline = inline
 
     def add_button(self, button: MenuButton):
         if self.buttons is None:

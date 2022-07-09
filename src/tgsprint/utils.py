@@ -1,5 +1,6 @@
 import typing
 from telegram.ext import CallbackContext
+import emoji
 
 if typing.TYPE_CHECKING:
     from tgsprint.menu import BaseMenu
@@ -56,3 +57,6 @@ class TGContext(object):
 
     def get_invalidate_keyboard(self) -> bool:
         return self.context.user_data[self.TG_INVALIDATE_KEYBOARD]
+
+def emojize(message: str):
+    return emoji.emojize(message, language='alias')
