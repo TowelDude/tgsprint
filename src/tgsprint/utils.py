@@ -1,6 +1,7 @@
 import typing
 from telegram.ext import CallbackContext
 import emoji
+import re
 
 if typing.TYPE_CHECKING:
     from tgsprint.menu import BaseMenu

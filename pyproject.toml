@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tgsprint"
-version = "0.1"
+version = "0.1.1"
 description = "Setup telegram menu bot in lightning speed!"
 requires-python = ">=3.7"
 readme = "README.md"
