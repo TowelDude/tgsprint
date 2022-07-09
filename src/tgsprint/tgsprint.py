@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 from tgsprint.button import MenuButton
 from tgsprint.menu import BaseMenu
 from telegram.ext import Updater, InvalidCallbackData
@@ -23,14 +23,35 @@ class TGSprint(object):
         self.updater.dispatcher.add_handler(
             MessageHandler(Filters.text, self._handle_message))
 
+        self._pre_message_hooks = list()
+
+    def add_premessage_hook(self, hook: Callable[[Update, TGContext], bool]):
+        '''
+        Adds a callback to the premessage chain
+        Each callback will be executed (by order of insertion). 
+        The first callback to return False will stop further hooks and message processing
+        '''
+        self._pre_message_hooks.append(hook)
+
     def start(self, start_menu: BaseMenu):
         self.start_menu = start_menu
         self.updater.start_polling()
         self.updater.idle()
 
+    def _run_premessage_hooks(self, update: Update, context: TGContext) -> bool:
+        for hook in self._pre_message_hooks:
+            result = hook(update, context)
+            if not result:
+                return False
+        return True
+
     def _handle_message(self, update: Update, context: CallbackContext):
         tgcontext = TGContext(context)
         state: BaseState = tgcontext.get_state()
+        
+        should_continue = self._run_premessage_hooks(update, tgcontext)
+        if not should_continue:
+            return
 
         if type(state) is BaseState:
             if state.current_menu.inline:
@@ -54,8 +75,13 @@ class TGSprint(object):
             return
 
         tgcontext = TGContext(context)
-        current_menu = tgcontext.get_current_menu()
         update.callback_query.answer()
+
+        should_continue = self._run_premessage_hooks(update, tgcontext)
+        if not should_continue:
+            return
+
+        current_menu = tgcontext.get_current_menu()
         query_data = update.callback_query.data
 
         button: MenuButton = current_menu.find_button(query_data)
@@ -66,7 +92,12 @@ class TGSprint(object):
                 tgcontext.set_state(retval)
 
     def _handle_start_command(self, update: Update, context: CallbackContext):
-        self.go_home(update, TGContext(context))
+        tgcontext = TGContext(context)
+        should_continue = self._run_premessage_hooks(update, tgcontext)
+        if not should_continue:
+            return
+
+        self.go_home(update, tgcontext)
 
     def _send_menu(self, update: Update, context: TGContext, menu: BaseMenu):
         keyboard = menu.to_keyboard()

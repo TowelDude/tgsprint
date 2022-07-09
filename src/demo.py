@@ -16,6 +16,10 @@ logging.basicConfig(
 apikey = open(os.path.join(Path.home(), '.tgsprint', 'api.txt'), 'r').read().strip()
 tg = TGSprint(apikey)
 
+def sample_hook(update: Update, context: TGContext):
+    context.context.bot.send_message(update.effective_chat.id, 'hook!')
+    return True
+
 def null(update: Update, context: TGContext):
     context.context.bot.send_message(update.effective_chat.id, 'Hello!')
 
@@ -39,4 +43,5 @@ start_menu = InlineMenu('start', 'Welcome to my bot! :red_heart:')
 start_menu.add_button(MenuButton('goto menu2 :red_heart:',
                       callback=tg.goto_menu, callback_args=[menu2]))
 
+tg.add_premessage_hook(sample_hook)
 tg.start(start_menu)
