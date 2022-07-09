@@ -58,5 +58,11 @@ class TGContext(object):
     def get_invalidate_keyboard(self) -> bool:
         return self.context.user_data[self.TG_INVALIDATE_KEYBOARD]
 
-def emojize(message: str):
-    return emoji.emojize(message, language='alias')
+# taken from https://github.com/mevellea/telegram_menu
+def emojize(label: str) -> str:
+    """Replace emoji token with utf-16 code."""
+    match_emoji = re.findall(r"(:\w+:)", label)
+    for item in match_emoji:
+        emoji_str = emoji.emojize(item, use_aliases=True)
+        label = label.replace(item, emoji_str)
+    return label
