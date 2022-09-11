@@ -1,4 +1,5 @@
 # TGSprint
+*WIP*
 This library was developed to help you easily create a telegram bot that has a menu.  
 The library (currently) ONLY takes care of the menu stuff, and leaves the rest to you (based on PTB)  
 
